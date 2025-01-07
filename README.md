@@ -1,2 +1,3 @@
 # CNAB-BAIXA
-Repo
+*****
+CNAB creation base for use
