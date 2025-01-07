@@ -1,0 +1,51 @@
+import datetime
+
+def formatar_campo(valor, tamanho, tipo='D'):
+    if tipo == 'D':
+        return str(valor).ljust(tamanho)[:tamanho]
+    elif tipo == 'N':
+        return str(valor).zfill(tamanho)
+    return str(valor)
+
+def gerar_cnab_baixa():
+    # Dados fictícios para a baixa
+    dados_baixa = [
+        {
+            'codigo_banco': '237',  # Código do banco (237 é o código do Bradesco)
+            'tipo_registro': '3',   # Tipo de registro (3 para baixa)
+            'nosso_numero': '123456789012345',  # Nosso número
+            'vencimento': '2023-12-01',  # Data de vencimento
+            'valor': 1000.00,  # Valor da baixa
+            'cedente': '000123456789',  # Código do cedente
+            'data_baixa': '2023-12-05',  # Data da baixa
+            'numero_documento': '20231205',  # Número do documento
+        }
+    ]
+
+    # Cabeçalho do arquivo CNAB
+    header = '0' + formatar_campo('1', 1, 'N') + '000000000001' + formatar_campo('REMESSA', 7, 'D') + \
+             formatar_campo(datetime.datetime.now().strftime('%d%m%Y'), 8, 'N') + \
+             formatar_campo('240', 3, 'N') + formatar_campo('BRADESCO', 15, 'D') + '\n'
+
+    # Detalhes da baixa
+    detalhes = ''
+    for baixa in dados_baixa:
+        linha = formatar_campo(baixa['codigo_banco'], 3, 'N') + formatar_campo(baixa['tipo_registro'], 1, 'N') + \
+               formatar_campo(baixa['nosso_numero'], 17, 'N') + formatar_campo(baixa['vencimento'], 8, 'N') + \
+               formatar_campo(int(baixa['valor'] * 100), 13, 'N') + formatar_campo(baixa['cedente'], 15, 'N') + \
+               formatar_campo(baixa['data_baixa'], 8, 'N') + formatar_campo(baixa['numero_documento'], 15, 'N') + '\n'
+        detalhes += linha
+
+    # Rodapé do arquivo CNAB
+    rodape = '9' + formatar_campo('000000000001', 9, 'N') + formatar_campo('000000000000', 9, 'N') + '\n'
+
+    # Criar o arquivo CNAB
+    with open('cnab_baixa.txt', 'w') as f:
+        f.write(header)
+        f.write(detalhes)
+        f.write(rodape)
+
+    print("Arquivo CNAB de baixa gerado com sucesso.")
+
+# Chamada para gerar o CNAB
+gerar_cnab_baixa()
